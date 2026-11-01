@@ -133,11 +133,8 @@ in
       type = lib.types.bool;
     };
     url = lib.mkOption {
-      default = "http://127.0.0.1:${
-        toString (lib.attrByPath [ "http" "server_port" ] 8123 (haCfg.config or { }))
-      }";
-      defaultText = lib.literalExpression ''"http://127.0.0.1:''${services.home-assistant.config.http.server_port}"'';
-      description = "URL under which the provisioning tool reaches Home Assistant.";
+      default = "http://127.0.0.1:8123";
+      description = "URL under which the provisioning tool reaches Home Assistant. Adjust it when the HTTP server settings in Home Assistant use another port.";
       type = lib.types.str;
     };
     waitTimeout = lib.mkOption {
