@@ -39,9 +39,13 @@ testers.nixosTest {
     wait_for_provisioning()
     assert machine.succeed("cat /var/lib/hass/provision.json") == state
 
-    machine.succeed("/run/booted-system/specialisation/garage/bin/switch-to-configuration test")
+    machine.succeed("/run/booted-system/specialisation/kitchen/bin/switch-to-configuration test")
     wait_for_provisioning()
-    retry(lambda _: area_exists("garage"), timeout_seconds=120)
+    retry(lambda _: area_exists("kitchen"), timeout_seconds=120)
+
+    machine.succeed("systemctl stop home-assistant-provision.service home-assistant.service")
+    machine.execute("systemctl start home-assistant-provision.service")
+    wait_for_provisioning()
   '';
   nodes.machine = {
     imports = [ module ];
@@ -89,7 +93,7 @@ testers.nixosTest {
       };
     };
     environment.etc.owner-password.text = "correct horse battery staple";
-    specialisation.garage.configuration.services.home-assistant.provision.areas.garage = { };
+    specialisation.kitchen.configuration.services.home-assistant.provision.areas.kitchen = { };
     virtualisation.memorySize = 2048;
   };
 }
