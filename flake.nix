@@ -62,6 +62,9 @@
             inputsFrom = [ config.treefmt.build.devShell ];
             shellHook = config.pre-commit.installationScript;
           };
+          packages.vm-test = pkgs.callPackage ./nix/vm-test.nix {
+            module = inputs.self.nixosModules.default;
+          };
           pre-commit.settings.hooks = {
             deadnix.enable = true;
             statix.enable = true;
