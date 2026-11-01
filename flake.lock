@@ -116,6 +116,38 @@
         "type": "github"
       }
     },
+    "home-assistant-provision": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "git-hooks-nix": [
+          "git-hooks-nix"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "pedantix": [
+          "pedantix"
+        ],
+        "treefmt-nix": [
+          "treefmt-nix"
+        ]
+      },
+      "locked": {
+        "lastModified": 1793531962,
+        "narHash": "sha256-U1Eh0rEkhMIr1cJjPp6VMF+P0f6ZZ1NPLMSLDqId5wE=",
+        "owner": "Swarsel",
+        "repo": "home-assistant-provision",
+        "rev": "50c6d58fd1945f0700088829cf409544f763e257",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Swarsel",
+        "repo": "home-assistant-provision",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1793341285,
@@ -159,6 +191,7 @@
       "inputs": {
         "flake-parts": "flake-parts",
         "git-hooks-nix": "git-hooks-nix",
+        "home-assistant-provision": "home-assistant-provision",
         "nixpkgs": "nixpkgs",
         "pedantix": "pedantix",
         "treefmt-nix": "treefmt-nix_2"

@@ -12,6 +12,17 @@
       url = "github:cachix/git-hooks.nix";
     };
 
+    home-assistant-provision = {
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        git-hooks-nix.follows = "git-hooks-nix";
+        nixpkgs.follows = "nixpkgs";
+        pedantix.follows = "pedantix";
+        treefmt-nix.follows = "treefmt-nix";
+      };
+      url = "github:Swarsel/home-assistant-provision";
+    };
+
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     pedantix = {
@@ -28,6 +39,17 @@
   outputs =
     inputs@{ flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
+      flake.nixosModules = rec {
+        default = home-assistant-provision;
+        home-assistant-provision =
+          { lib, pkgs, ... }:
+          {
+            imports = [ ./nix/module.nix ];
+            services.home-assistant.provision.package =
+              lib.mkDefault
+                inputs.home-assistant-provision.packages.${pkgs.stdenv.hostPlatform.system}.default;
+          };
+      };
       imports = [
         inputs.treefmt-nix.flakeModule
         inputs.git-hooks-nix.flakeModule
