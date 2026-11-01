@@ -177,6 +177,7 @@ in
         Group = "hass";
         LoadCredential = [ "password:${cfg.owner.passwordFile}" ];
         PrivateTmp = true;
+        RemainAfterExit = true;
         Type = "oneshot";
         User = "hass";
       };

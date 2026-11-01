@@ -9,15 +9,13 @@ testers.nixosTest {
             "systemctl show -p ActiveState -p Result --value home-assistant-provision.service"
         ).split()
 
-    machine.wait_for_unit("home-assistant.service")
-    machine.wait_until_succeeds(
-        "systemctl show -p ActiveState --value home-assistant-provision.service | grep -qE '^(inactive|failed)$'", timeout=600
-    )
-    if provisioning_result() != ["inactive", "success"]:
-        print(machine.succeed("journalctl -u home-assistant-provision.service --no-pager"))
-        raise Exception("provisioning failed")
-    state = machine.succeed("cat /var/lib/hass/provision.json")
-    assert '"mqtt"' in state and '"office"' in state, state
+    def wait_for_provisioning():
+        machine.wait_until_succeeds(
+            "systemctl show -p SubState --value home-assistant-provision.service | grep -qE '^(exited|failed)$'", timeout=600
+        )
+        if provisioning_result() != ["active", "success"]:
+            print(machine.succeed("journalctl -u home-assistant-provision.service --no-pager"))
+            raise Exception("provisioning failed")
 
     def storage(name):
         machine.wait_for_file(f"/var/lib/hass/.storage/{name}")
@@ -26,12 +24,24 @@ testers.nixosTest {
     def entries():
         return storage("core.config_entries")["entries"]
 
+    def area_exists(name):
+        return any(a["name"] == name for a in storage("core.area_registry")["areas"])
+
+    machine.wait_for_unit("home-assistant.service")
+    wait_for_provisioning()
+    state = machine.succeed("cat /var/lib/hass/provision.json")
+    assert '"mqtt"' in state and '"office"' in state, state
     retry(lambda _: any(e["domain"] == "mqtt" and e["title"] == "Broker" for e in entries()), timeout_seconds=120)
     retry(lambda _: all(e["domain"] != "shopping_list" for e in entries()), timeout_seconds=120)
-    retry(lambda _: any(a["name"] == "office" for a in storage("core.area_registry")["areas"]), timeout_seconds=120)
-    machine.succeed("systemctl start home-assistant-provision.service")
-    assert provisioning_result() == ["inactive", "success"]
+    retry(lambda _: area_exists("office"), timeout_seconds=120)
+
+    machine.succeed("systemctl restart home-assistant-provision.service")
+    wait_for_provisioning()
     assert machine.succeed("cat /var/lib/hass/provision.json") == state
+
+    machine.succeed("/run/booted-system/specialisation/garage/bin/switch-to-configuration test")
+    wait_for_provisioning()
+    retry(lambda _: area_exists("garage"), timeout_seconds=120)
   '';
   nodes.machine = {
     imports = [ module ];
@@ -79,6 +89,7 @@ testers.nixosTest {
       };
     };
     environment.etc.owner-password.text = "correct horse battery staple";
+    specialisation.garage.configuration.services.home-assistant.provision.areas.garage = { };
     virtualisation.memorySize = 2048;
   };
 }
