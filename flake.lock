@@ -135,11 +135,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793531962,
-        "narHash": "sha256-U1Eh0rEkhMIr1cJjPp6VMF+P0f6ZZ1NPLMSLDqId5wE=",
+        "lastModified": 1793569082,
+        "narHash": "sha256-IyWCosH6H6hkwFKWPbHaxntD5Y31uVkKzgKy/nC3eRQ=",
         "owner": "Swarsel",
         "repo": "home-assistant-provision",
-        "rev": "50c6d58fd1945f0700088829cf409544f763e257",
+        "rev": "e213faa1993c715e5f715c3de8c66cd88fcc2fcb",
         "type": "github"
       },
       "original": {
